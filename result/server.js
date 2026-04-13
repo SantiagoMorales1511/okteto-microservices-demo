@@ -11,6 +11,7 @@ var express = require('express'),
   });
 
 var port = process.env.PORT || 4000;
+var databaseUrl = process.env.DATABASE_URL || 'postgres://okteto:okteto@postgresql/votes';
 
 io.sockets.on('connection', function (socket) {
   socket.emit('message', { text: 'Welcome!' });
@@ -21,7 +22,7 @@ io.sockets.on('connection', function (socket) {
 });
 
 var pool = new pg.Pool({
-  connectionString: 'postgres://okteto:okteto@postgresql/votes',
+  connectionString: databaseUrl,
 });
 
 async.retry(

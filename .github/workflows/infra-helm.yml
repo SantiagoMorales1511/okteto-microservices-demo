@@ -1,0 +1,30 @@
+name: Infraestructura Helm
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  helm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+      - name: infrastructure
+        run: |
+          helm lint infrastructure
+          helm template infra infrastructure > /dev/null
+      - name: vote
+        run: |
+          helm lint vote/chart
+          helm template vote vote/chart > /dev/null
+      - name: worker
+        run: |
+          helm lint worker/chart
+          helm template worker worker/chart > /dev/null
+      - name: result
+        run: |
+          helm lint result/chart
+          helm template result result/chart > /dev/null

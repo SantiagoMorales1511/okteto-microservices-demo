@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 
 	"database/sql"
 	"fmt"
@@ -21,13 +22,13 @@ var (
 	messageCountStart = kingpin.Flag("messageCountStart", "Message counter start from:").Int()
 )
 
-const (
-	host     = "postgresql"
-	port     = 5432
-	user     = "okteto"
-	password = "okteto"
-	dbname   = "votes"
-)
+func getenv(key, fallback string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		return fallback
+	}
+	return value
+}
 
 func main() {
 	db := openDatabase()
@@ -80,7 +81,12 @@ func main() {
 }
 
 func openDatabase() *sql.DB {
-	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+	host := getenv("POSTGRES_HOST", "postgresql")
+	port := getenv("POSTGRES_PORT", "5432")
+	user := getenv("POSTGRES_USER", "okteto")
+	password := getenv("POSTGRES_PASSWORD", "okteto")
+	dbname := getenv("POSTGRES_DB", "votes")
+	psqlconn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 	for {
 		db, err := sql.Open("postgres", psqlconn)
 		if err == nil {
@@ -103,7 +109,11 @@ func getKafkaMaster() sarama.Consumer {
 	kingpin.Parse()
 	config := sarama.NewConfig()
 	config.Consumer.Return.Errors = true
+	envBrokers := getenv("KAFKA_BROKERS", "")
 	brokers := *brokerList
+	if envBrokers != "" {
+		brokers = strings.Split(envBrokers, ",")
+	}
 	fmt.Println("Waiting for kafka...")
 	for {
 		master, err := sarama.NewConsumer(brokers, config)
