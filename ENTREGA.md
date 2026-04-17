@@ -49,5 +49,4 @@ Como parte de la entrega se incluye:
   - `docker compose down`
 - Apagar y borrar volúmenes:
   - `docker compose down -v`
-
-  demo pipeline
+pipeline
