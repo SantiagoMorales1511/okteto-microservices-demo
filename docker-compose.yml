@@ -31,7 +31,7 @@ services:
     ports:
       - "9092:9092"
     healthcheck:
-      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/127.0.0.1/9092'"]
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/127.0.0.1/9092'"]f
       interval: 10s
       timeout: 5s
       retries: 30
@@ -59,6 +59,7 @@ services:
       POSTGRES_USER: okteto
       POSTGRES_PASSWORD: okteto
       POSTGRES_DB: votes
+      mem_limit: 256m
     depends_on:
       kafka:
         condition: service_healthy
